@@ -42,4 +42,11 @@ public class WristSubsystem extends SubsystemBase {
     public void hold() {
         wristMotor.setVoltage(0.5);
     }
-}
+
+    public void setMotor(double speed) {
+        
+    }
+
+    public double getEncoderDistance() {
+        return 0.5;} 
+    }
