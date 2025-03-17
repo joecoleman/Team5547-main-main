@@ -19,6 +19,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.BasicDriveAuton;
+import frc.robot.commands.DriveForwardCmd;
 import frc.robot.commands.ElevatorUpPIDCmd;
 import frc.robot.commands.ResetGyro;
 import frc.robot.commands.WristUpPIDCmd;
@@ -31,7 +32,9 @@ import frc.robot.subsystems.Gyro;
 import frc.robot.subsystems.WristSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -143,7 +146,15 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // Set speed to .2 meters pre second; the driver needs to a-stop.
-    return new BasicDriveAuton(m_robotDrive);
+    return new SequentialCommandGroup(
+        new DriveForwardCmd(m_robotDrive, 3),
+
+        new ParallelCommandGroup(
+            new ElevatorUpPIDCmd(m_elevator, 0.5),
+            new WristUpPIDCmd(m_wrist, 0.5)
+        ),
+
+        new InstantCommand(() -> m_coralIntake.eject())
+    );
   }
 }
