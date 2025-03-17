@@ -21,6 +21,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.commands.BasicDriveAuton;
 import frc.robot.commands.ElevatorUpPIDCmd;
 import frc.robot.commands.ResetGyro;
+import frc.robot.commands.WristUpPIDCmd;
 import frc.robot.subsystems.AlgaeIntakeSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CoralIntakeSubsystem;
@@ -101,7 +102,10 @@ public class RobotContainer {
     //m_driverController.y().whileTrue(new InstantCommand(
      //       () -> m_robotDrive.resetGyro(),
      //       m_robotDrive));
+    
     m_operatorController.rightBumper().whileTrue(new ElevatorUpPIDCmd(m_elevator, 0.5))
+        .onFalse(new InstantCommand(() -> m_elevator.hold()));
+    m_operatorController.rightBumper().whileTrue(new WristUpPIDCmd(m_wrist, 0.5))
         .onFalse(new InstantCommand(() -> m_elevator.hold()));
     // AlgaeIntake
     m_driverController.rightBumper().whileTrue(new InstantCommand(() -> m_algaeIntake.intake(0.7)))

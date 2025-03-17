@@ -30,4 +30,12 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     public void stop() {
         intakeMotor.stopMotor(); // Stop the motor
     }
+
+    public void setMotor(double speed) {
+        
+    }public double getEncoderDistance() {
+
+        // Replace with actual implementation to get encoder distance
+    
+        return 0.5;}
 }
