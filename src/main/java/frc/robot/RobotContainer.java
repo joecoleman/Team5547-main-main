@@ -51,6 +51,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.events.EventTrigger;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -77,7 +78,6 @@ public class RobotContainer {
   private final CoralIntakeSubsystem m_coralIntake = new CoralIntakeSubsystem();
   private final WristSubsystem m_wrist = new WristSubsystem();
   private final SendableChooser<Command> autoChooser;
-
   // The driver's controller
   CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
   // The operators controller
