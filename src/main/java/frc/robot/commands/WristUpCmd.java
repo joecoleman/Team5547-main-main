@@ -12,7 +12,7 @@ public class WristUpCmd extends Command {
   private final WristSubsystem wrist;
   private double speed = 0.5;
   
-    /** Creates a new ElevatorUp. */
+   
     public WristUpCmd(WristSubsystem wrist, double speed) {
       this.wrist = wrist;
       this.speed = speed;
