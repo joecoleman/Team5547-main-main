@@ -6,6 +6,12 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,6 +21,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -22,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 @SuppressWarnings("unused")
 public class DriveSubsystem extends SubsystemBase {
+
   // Create MAXSwerveModules
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
       DriveConstants.kFrontLeftDrivingCanId,
@@ -43,7 +51,7 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kRearRightTurningCanId,
       DriveConstants.kBackRightChassisAngularOffset);
 
-      
+     
 
   // The gyro sensor
   private final Gyro m_gyro;
@@ -191,13 +199,56 @@ public class DriveSubsystem extends SubsystemBase {
     return m_gyro.getTurnRate();
   }
 
+
+
+
 public void setMotors(double i, double j) {
  
 }
 
 public double getEncoderMeters() {
   return 1;
- 
 }
+
+public void configureAutoBuilder() {
+  RobotConfig config;
+  try {
+    config = RobotConfig.fromGUISettings();
+  } catch (Exception e) {
+    e.printStackTrace();
+    return;
+  }
+  AutoBuilder.configure(
+    this::getPose,
+    this::resetOdometry,
+    this::getRobotRelativeSpeeds,
+    (speeds, feedforward) -> driveRobotRelative(speeds),
+    new PPHolonomicDriveController(
+      new PIDConstants(5.0, 0.0, 0.0),
+      new PIDConstants(5.0, 0.0, 0.0)
+    ),
+    config,
+    () -> {
+      var alliance = DriverStation.getAlliance();
+      if (alliance.isPresent()) {
+        return alliance.get() == DriverStation.Alliance.Red;
+      }
+      return false;
+    },
+    this
+  );
+}
+  
+  private ChassisSpeeds getRobotRelativeSpeeds() {
+    // Implement the logic to get robot relative speeds
+    return new ChassisSpeeds(0, 0, 0); // Placeholder implementation
+  }
+
+  private Object driveRobotRelative(ChassisSpeeds speeds) {
+   
+    throw new UnsupportedOperationException("Unimplemented method 'driveRobotRelative'");
+  }
+
+ 
 
 }
