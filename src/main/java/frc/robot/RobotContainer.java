@@ -15,10 +15,13 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.BasicDriveAuton;
+import frc.robot.commands.CoralEjectCmd;
 import frc.robot.commands.DriveForwardCmd;
 import frc.robot.commands.ElevatorUpPIDCmd;
 import frc.robot.commands.ResetGyro;
@@ -31,6 +34,7 @@ import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.Gyro;
 import frc.robot.subsystems.WristSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -45,6 +49,15 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.events.EventTrigger;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.events.EventTrigger;
+
+
+
 
 
 /*
@@ -63,6 +76,7 @@ public class RobotContainer {
   private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
   private final CoralIntakeSubsystem m_coralIntake = new CoralIntakeSubsystem();
   private final WristSubsystem m_wrist = new WristSubsystem();
+  private final SendableChooser<Command> autoChooser;
 
   // The driver's controller
   CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
@@ -73,6 +87,15 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    NamedCommands.registerCommand("DriveForward", new DriveForwardCmd(m_robotDrive, 1.0));
+    NamedCommands.registerCommand("ElevatorUp", new ElevatorUpPIDCmd(m_elevator, 1.0));
+    NamedCommands.registerCommand("WristUp", new WristUpPIDCmd(m_wrist, 1.0));
+    NamedCommands.registerCommand("CoralEject", new CoralEjectCmd(m_coralIntake, .2));
+        
+    
+    autoChooser = AutoBuilder.buildAutoChooser("Auto1");
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+    
     // Configure the button bindings
     configureButtonBindings();
 
@@ -106,10 +129,7 @@ public class RobotContainer {
      //       () -> m_robotDrive.resetGyro(),
      //       m_robotDrive));
     
-    m_operatorController.rightBumper().whileTrue(new ElevatorUpPIDCmd(m_elevator, 0.5))
-        .onFalse(new InstantCommand(() -> m_elevator.hold()));
-    m_operatorController.rightBumper().whileTrue(new WristUpPIDCmd(m_wrist, 0.5))
-        .onFalse(new InstantCommand(() -> m_elevator.hold()));
+   
     // AlgaeIntake
     m_driverController.rightBumper().whileTrue(new InstantCommand(() -> m_algaeIntake.intake(0.7)))
         .onFalse(new InstantCommand(() -> m_algaeIntake.stop()));
@@ -146,15 +166,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new SequentialCommandGroup(
-        new DriveForwardCmd(m_robotDrive, 3),
-
-        new ParallelCommandGroup(
-            new ElevatorUpPIDCmd(m_elevator, 0.5),
-            new WristUpPIDCmd(m_wrist, 0.5)
-        ),
-
-        new InstantCommand(() -> m_coralIntake.eject())
-    );
+    return autoChooser.getSelected();
   }
 }
