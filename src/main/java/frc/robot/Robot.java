@@ -25,7 +25,7 @@ public class Robot extends TimedRobot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   private RobotContainer m_robotContainer;
-
+ 
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -39,7 +39,7 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
     CameraServer.startAutomaticCapture("camera", 0);
-
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
   }
 
   /**

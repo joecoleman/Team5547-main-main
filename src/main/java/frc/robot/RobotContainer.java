@@ -145,6 +145,7 @@ public class RobotContainer {
 
     m_driverController.y().onTrue(new ResetGyro(m_robotDrive));
   
+    
 
   new SequentialCommandGroup(
     new InstantCommand(() -> m_robotDrive.drive(0, 0, 0, true)),
@@ -155,5 +156,10 @@ public class RobotContainer {
     new InstantCommand(() -> m_coralIntake.intake(1.0)),
     new WaitCommand(1),
     new InstantCommand(() -> m_coralIntake.stop()));
+}
+
+public Command getAutonomousCommand() {
+   
+    throw new UnsupportedOperationException("Unimplemented method 'getAutonomousCommand'");
 }}
 
