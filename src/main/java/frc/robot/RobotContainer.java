@@ -40,22 +40,13 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.List;
 import java.util.function.BooleanSupplier;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.events.EventTrigger;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.events.EventTrigger;
+
 
 
 
@@ -77,7 +68,7 @@ public class RobotContainer {
   private final ElevatorSubsystem m_elevator = new ElevatorSubsystem();
   private final CoralIntakeSubsystem m_coralIntake = new CoralIntakeSubsystem();
   private final WristSubsystem m_wrist = new WristSubsystem();
-  private final SendableChooser<Command> autoChooser;
+  
   // The driver's controller
   CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
   // The operators controller
@@ -87,14 +78,10 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    NamedCommands.registerCommand("DriveForward", new DriveForwardCmd(m_robotDrive, 1.0));
-    NamedCommands.registerCommand("ElevatorUp", new ElevatorUpPIDCmd(m_elevator, 1.0));
-    NamedCommands.registerCommand("WristUp", new WristUpPIDCmd(m_wrist, 1.0));
-    NamedCommands.registerCommand("CoralEject", new CoralEjectCmd(m_coralIntake, .2));
+    
         
     
-    autoChooser = AutoBuilder.buildAutoChooser("Auto1");
-    SmartDashboard.putData("Auto Chooser", autoChooser);
+    
     
     // Configure the button bindings
     configureButtonBindings();
@@ -109,8 +96,7 @@ public class RobotContainer {
                 -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
                 -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
                 true),
-            m_robotDrive));
-  }
+            m_robotDrive)); }
 
   /**
    * Use this method to define your button->command mappings. Buttons can be
@@ -158,14 +144,16 @@ public class RobotContainer {
     // m_driverController.leftTrigger().whileTrue(new InstantCommand(() -> m_elevator.move(-m_driverController.getLeftTriggerAxis()))).onFalse(new InstantCommand(() -> m_elevator.stop()));
 
     m_driverController.y().onTrue(new ResetGyro(m_robotDrive));
-  }
+  
 
-  /**
-   * pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
-  }
-}
+  new SequentialCommandGroup(
+    new InstantCommand(() -> m_robotDrive.drive(0, 0, 0, true)),
+    new WaitCommand(2),
+    new InstantCommand(() -> m_wrist.moveUp(1)),
+    new WaitCommand(1),
+    new InstantCommand(() -> m_wrist.stop()),
+    new InstantCommand(() -> m_coralIntake.intake(1.0)),
+    new WaitCommand(1),
+    new InstantCommand(() -> m_coralIntake.stop()));
+}}
+
