@@ -7,10 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -72,9 +69,8 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearRight.getPosition()
       });
 
-    // Usage reporting for MAXSwerve template
-    HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
-  configureAutoBuilder();}
+    
+  }
 
   @Override
   public void periodic() {
@@ -210,34 +206,9 @@ public double getEncoderMeters() {
   return 1;
 }
 
-public void configureAutoBuilder() {
-  RobotConfig config;
-  try {
-    config = RobotConfig.fromGUISettings();
-  } catch (Exception e) {
-    e.printStackTrace();
-    return;
-  }
-  AutoBuilder.configure(
-    this::getPose,
-    this::resetOdometry,
-    this::getRobotRelativeSpeeds,
-    (speeds, feedforward) -> driveRobotRelative(speeds),
-    new PPHolonomicDriveController(
-      new PIDConstants(5.0, 0.0, 0.0),
-      new PIDConstants(5.0, 0.0, 0.0)
-    ),
-    config,
-    () -> {
-      var alliance = DriverStation.getAlliance();
-      if (alliance.isPresent()) {
-        return alliance.get() == DriverStation.Alliance.Red;
-      }
-      return false;
-    },
-    this
-  );
-}
+
+
+
   
   private ChassisSpeeds getRobotRelativeSpeeds() {
     // Implement the logic to get robot relative speeds
